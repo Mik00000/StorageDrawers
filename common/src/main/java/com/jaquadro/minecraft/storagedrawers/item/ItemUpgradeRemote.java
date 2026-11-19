@@ -135,6 +135,9 @@ public class ItemUpgradeRemote extends ItemUpgrade
         if (pos == null)
             return null;
 
+        if (!level.hasChunkAt(pos))
+            return null;
+
         BlockEntity entity = level.getBlockEntity(pos);
         if (entity instanceof BlockEntityController bec)
             return bec;
@@ -149,8 +152,11 @@ public class ItemUpgradeRemote extends ItemUpgrade
         for (int i = 0; i < inventory.getContainerSize(); i++) {
             ItemStack stack = inventory.getItem(i);
             if (!stack.isEmpty() && stack.getItem() instanceof ItemUpgradeRemote item) {
-                if (item.bound && getBoundController(stack, level) == null)
-                    inventory.setItem(i, setUnbound(stack));
+                if (item.bound) {
+                    BlockPos pos = getBoundPosition(stack);
+                    if (pos != null && level.hasChunkAt(pos) && getBoundController(stack, level) == null)
+                        inventory.setItem(i, setUnbound(stack));
+                }
             }
         }
     }

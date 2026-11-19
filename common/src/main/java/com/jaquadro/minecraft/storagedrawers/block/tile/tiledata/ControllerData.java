@@ -53,6 +53,11 @@ public class ControllerData extends BlockEntityDataShim
         if (host.getLevel() == null)
             return null;
 
+        if (!host.getLevel().isLoaded(controllerCoord)) {
+            setNeedsValidation(true);
+            return null;
+        }
+
         BlockEntity blockEntity = host.getLevel().getBlockEntity(controllerCoord);
         if (!(blockEntity instanceof BlockEntityController)) {
             controllerCoord = null;

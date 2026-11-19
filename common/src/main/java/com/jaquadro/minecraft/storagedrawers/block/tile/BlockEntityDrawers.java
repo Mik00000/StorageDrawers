@@ -217,6 +217,23 @@ public abstract class BlockEntityDrawers extends BaseBlockEntity implements IDra
         if (ModCommonConfig.INSTANCE.GENERAL.debugTrace.get())
             ModServices.log.info("BlockEntityDrawers [{}] checkBoundController", getBlockPos());
 
+        if (level == null)
+            return;
+
+        BlockPos coord = controllerData.getCoord();
+        boolean unloaded = coord != null && !level.isLoaded(coord);
+        if (!unloaded) {
+            ItemStack remote = upgradeData.getRemoteUpgrade();
+            if (remote != null && remote.getItem() instanceof ItemUpgradeRemote) {
+                BlockPos bound = ItemUpgradeRemote.getBoundPosition(remote);
+                unloaded = bound != null && !level.isLoaded(bound);
+            }
+        }
+        if (unloaded) {
+            controllerData.setNeedsValidation(true);
+            return;
+        }
+
         controllerData.setNeedsValidation(false);
         BlockEntityController controller = controllerData.getController(this);
         ItemStack remote = upgradeData.getRemoteUpgrade();
